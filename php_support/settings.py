@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userapp',
-    'support_bot',    
 ]
 
 MIDDLEWARE = [
@@ -133,7 +132,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Users
-AUTH_USER_MODEL = 'userapp.User'
-
-# Telegram bot
-TELEGRAM_BOT_TOKEN = env.str('TELEGRAM_BOT_TOKEN')
+# AUTH_USER_MODEL = 'userapp.User'
+# REQUIRED_FIELDS = []
