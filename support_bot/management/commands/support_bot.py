@@ -319,7 +319,8 @@ class Command(BaseCommand):
             text = f'{text}Завершён: {finished_at}\n'
         text = f'{text}\n{order.description}\n{formed_message}'
 
-        keyboard = [[self.get_new_order_button(), self.get_my_orders_button()],[self.get_main_menu_button()]]
+        keyboard = [[self.get_new_order_button(), self.get_my_orders_button()], [self.get_main_menu_button()]]
+
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=text,
