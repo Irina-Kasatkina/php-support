@@ -448,7 +448,7 @@ class Command(BaseCommand):
             )
             return DEVELOPER_BASE_MENU
 
-        orders = [str(count+1) + ' ' + order.title + ' ' + order.finished_at.strftime('%m/%d/%Y, %H:%M:%S') for count, order in enumerate(orders)]
+        orders = ['*' + str(count+1) + ': ' + order.title + ' ' + order.finished_at.strftime('%m/%d/%Y, %H:%M:%S')+'*' for count, order in enumerate(orders)]
 
         message = '\n'.join(orders)
 
@@ -457,6 +457,7 @@ class Command(BaseCommand):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
+            parse_mode='Markdown',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return DEVELOPER_BASE_MENU
@@ -705,9 +706,9 @@ class Command(BaseCommand):
             )
 
         message = dedent(f'''
-                    Заголовок: {order.title}
-                    Описание: {order.description}
-                    Клиент: {order.client.name}
+                    *Заголовок:* {order.title}
+                    *Описание:* {order.description}
+                    *Клиент:* {order.client.name}
                     ''')
 
         context.user_data['order_id'] = order_id
@@ -716,6 +717,7 @@ class Command(BaseCommand):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
+            parse_mode='Markdown',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
