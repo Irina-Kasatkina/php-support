@@ -51,7 +51,6 @@ class Developer(models.Model):
         verbose_name='Чат в Telegram',
         on_delete=models.CASCADE,
         related_name='chats',
-        blank=True,
     )
     work_allowed = models.BooleanField('Разрешено ли работать', default=False)
    
