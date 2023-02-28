@@ -8,10 +8,29 @@
  <form method="post">
     {% csrf_token %}
     {{ formset.management_form }}
+      <table>
+          <tr>
+            <td>№</td>
+            <td>ФИО</td>
+            <td>Чат id</td>
+            <td>Допуск</td>
+          </tr>
           {% for form in formset %}
-              {{ form }}
               {{ form.id }}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                  {{ form.name }}
+                </td>
+                <td>
+                  {{ form.chat }}
+                </td>
+                <td>
+                  {{ form.work_allowed }}
+                </td>
+              </tr>
           {% endfor %}
+      </table>
    <input type="submit" value="Submit">
  </form>
 
