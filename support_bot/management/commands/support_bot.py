@@ -523,11 +523,11 @@ class Command(BaseCommand):
         formed_message = ''
         for message in order_messages:
             if not message.sender_role:
-                formed_message += 'Программист: ' + message.text + '\n'
+                formed_message += f'Программист: *{message.text}*\n'
             else:
-                formed_message += 'Заказчик: ' + message.text + '\n'
+                formed_message += f'Заказчик: *{message.text}*\n'
 
-        message = f'title: {order.title}\ndescription: {order.description}\ncustomer: {order.client}\n\nmessages:\n{formed_message}'
+        message = f'*Название:* {order.title}\n*Описание:* {order.description}\n*Заказчик:* {order.client}\n\n*Сообщения:*\n{formed_message}'
         context.user_data['order_id'] = order.pk
         keyboard.append([InlineKeyboardButton('Задать вопрос по заказу', callback_data='make_question_order')])
         keyboard.append([InlineKeyboardButton('Сделано', callback_data='make_done_order')])
@@ -535,6 +535,7 @@ class Command(BaseCommand):
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
+            parse_mode='Markdown',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return DEVELOPER_BASE_MENU
