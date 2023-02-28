@@ -329,44 +329,6 @@ class Command(BaseCommand):
         )
         return CLIENT_BASE_MENU
 
-    def handle_make_question_order_client(self, update, context):
-
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text='Введите вопрос'
-        )
-
-        return self.handle_add_question_order_client(update, context)
-
-    def handle_add_question_order_client(self, update, context):
-
-        keyboard = []
-        message_question = update.message.text
-        try:
-            order = Order.objects.get(pk=context.user_data['order_id'])
-        except ObjectDoesNotExist:
-            message = 'Такого заказа нет'
-            keyboard.append([InlineKeyboardButton('Назад', callback_data='client_orders')])
-            context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=message,
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-            return DEVELOPER_BASE_MENU
-
-        message = 'Ваш вопрос отправлен разработчику'
-
-        question = Message.objects.create(text=message_question, order=order, sender_role=1)
-
-        keyboard.append([InlineKeyboardButton('<< Назад', callback_data='client_orders')])
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=message,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-
-        return self.handle_client_orders_button(update, context)
-
     def get_order_number_from_bot(self, update, context):
         """Извлекает номер заказа из бота."""
 
