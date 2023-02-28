@@ -46,7 +46,7 @@ class Developer(models.Model):
     """Программист."""
 
     name = models.CharField('ФИО', max_length=200)
-    chat = models.OneToOneField(
+    chat = models.ForeignKey(
         Chat,
         verbose_name='Чат в Telegram',
         on_delete=models.CASCADE,
@@ -67,7 +67,7 @@ class Client(models.Model):
     """Заказчик."""
 
     name = models.CharField('ФИО', max_length=200)
-    chat = models.OneToOneField(
+    chat = models.ForeignKey(
         Chat,
         verbose_name='Чат в Telegram',
         on_delete=models.PROTECT
@@ -98,7 +98,7 @@ class Order(models.Model):
     published_at = models.DateTimeField('Время публикации', null=True, blank=True, auto_now=False)
     developer = models.ForeignKey(
         Developer,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='orders',
         verbose_name='Программист',
         null=True,
