@@ -303,12 +303,21 @@ class Command(BaseCommand):
             f'Создан: {created_at}\n'
         )
 
+        order_messages = Message.objects.filter(order=order).order_by('created_at')
+        formed_message = ''
+        for message in order_messages:
+            if not message.sender_role:
+                formed_message += f'Программист: *{message.text}*\n'
+            else:
+                formed_message += f'Заказчик: *{message.text}*\n'
+
+
         developer_name = order.developer.name if order.developer else '-'
         text = f'{text}Исполнитель: {developer_name}\n'           
         if order.finished_at:
             finished_at = f'{order.finished_at}'[:16]
             text = f'{text}Завершён: {finished_at}\n'
-        text = f'{text}\n{order.description}'
+        text = f'{text}\n{order.description}\n{formed_message}'
 
         keyboard = [[self.get_new_order_button(), self.get_my_orders_button()],[self.get_main_menu_button()]]
         context.bot.send_message(
