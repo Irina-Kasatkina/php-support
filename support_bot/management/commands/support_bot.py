@@ -670,7 +670,7 @@ class Command(BaseCommand):
             )
 
         chat, created = Chat.objects.get_or_create(chat_id=update.effective_chat.id)
-        developer, created = Developer.objects.get_or_create(name='update.', chat=chat, work_allowed=True)
+        developer, created = Developer.objects.get_or_create(name=update.effective_chat.id, chat=chat, work_allowed=True)
         order.developer = developer
         order.save()
 
