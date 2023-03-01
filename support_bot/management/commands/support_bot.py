@@ -317,18 +317,20 @@ class Command(BaseCommand):
 
 
         developer_name = order.developer.name if order.developer else '-'
-        text = f'{text}Исполнитель: {developer_name}\n'           
+        text = f'{text}Программист: {developer_name}\n'           
         if order.finished_at:
             finished_at = f'{order.finished_at}'[:16]
             text = f'{text}Завершён: {finished_at}\n'
         text = f'{text}\n{order.description}\n{formed_message}'
 
-        context.user_data['order_id'] = order.pk
-        keyboard = [
-            [InlineKeyboardButton('Написать сообщение по заказу', callback_data='client_make_question_order')],
-            [self.get_new_order_button(), self.get_my_orders_button()],
-            [self.get_main_menu_button()]
-        ]
+        context.user_data['order_number'] = order_number
+        keyboard = []
+        if order.developer:
+            keyboard.append([
+                InlineKeyboardButton('Написать сообщение программисту', callback_data='client_make_question_order')]
+            )
+        keyboard.append([self.get_new_order_button(), self.get_my_orders_button()])
+        keyboard.append([self.get_main_menu_button()])
 
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -337,6 +339,20 @@ class Command(BaseCommand):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return CLIENT_BASE_MENU
+
+    def get_order_number_from_bot(self, update, context):
+        """Извлекает номер заказа из бота."""
+
+        query = update.callback_query
+        if query:
+            query_data = query.data
+            order_number = int(query_data[query_data.rfind('_')+1:])
+            context.user_data['order_number'] = order_number
+            return order_number
+
+        if 'order_number' in context.user_data:
+            return context.user_data.get('order_number')
+        return None
  
     def handle_client_make_question_order(self, update, context):
 
@@ -344,14 +360,13 @@ class Command(BaseCommand):
             chat_id=update.effective_chat.id,
             text='Введите сообщение'
         )
-
         return CLIENT_ADD_QUESTION_ORDER
         
     def handle_client_add_question_order(self, update, context):
 
         keyboard = []
         message_question = update.message.text
-        order = Order.objects.get(pk=context.user_data['order_id'])
+        order = Order.objects.get(number=context.user_data['order_number'])
 
         message = 'Ваш вопрос отправлен программисту'
 
@@ -363,15 +378,6 @@ class Command(BaseCommand):
         )
 
         return self.send_client_order_details(update, context)        
-
-    def get_order_number_from_bot(self, update, context):
-        """Извлекает номер заказа из бота."""
-
-        if 'order_number' in context.user_data:
-            return context.user_data.pop('order_number')
- 
-        query_data = update.callback_query.data
-        return int(query_data[query_data.rfind('_')+1:])
       
     def send_client_message_order_not_exist(self, update, context):
         """Посылает в чат сообщение об отсутствии выбранного заказа для Заказчика."""
