@@ -714,7 +714,7 @@ class Command(BaseCommand):
         order.developer = developer
         order.save()
 
-        return self.handle_show_free_orders(update, context)
+        return self.handle_show_work_order(update, context)
 
     def handle_show_order(self, update, context):
 
