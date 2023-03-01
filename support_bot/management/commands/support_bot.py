@@ -27,6 +27,7 @@ CLIENT_BASE_MENU = 'CLIENT_BASE_MENU'
 CLIENT_NEW_ORDER_TITLE = 'CLIENT_NEW_ORDER_TITLE'
 CLIENT_ADD_ORDER_DESCRIPTION = 'CLIENT_ADD_ORDER_DESCRIPTION'
 CLIENT_ORDER_CHOICE = 'CLIENT_ORDER_CHOICE'
+CLIENT_ADD_QUESTION_ORDER = 'CLIENT_ADD_QUESTION_ORDER'
 DEVELOPER_BASE_MENU = 'DEVELOPER_BASE_MENU'
 DEVELOPER_SELECT_ORDER = 'DEVELOPER_SELECT_ORDER'
 DEVELOPER_ADD_QUESTION_ORDER = 'DEVELOPER_ADD_QUESTION_ORDER'
@@ -59,6 +60,7 @@ class Command(BaseCommand):
             START: self.handle_start_command,
             CLIENT_NEW_ORDER_TITLE: self.handle_new_order_title,
             CLIENT_ADD_ORDER_DESCRIPTION: self.handle_add_order_description,
+            CLIENT_ADD_QUESTION_ORDER: self.handle_client_add_question_order,
             DEVELOPER_ADD_QUESTION_ORDER: self.handle_add_question_order,
         }
 
@@ -147,6 +149,7 @@ class Command(BaseCommand):
             'developer': self.handle_developer_button,
             'client_new_order': self.handle_client_new_order_button,
             'client_orders': self.handle_client_orders_button,
+            'client_make_question_order': self.handle_client_make_question_order,
             'developer_agreement': self.handle_developer_agreement,
             'developer_registration': self.handle_developer_registration,
             'show_free_orders': self.handle_show_free_orders,
@@ -319,7 +322,12 @@ class Command(BaseCommand):
             text = f'{text}Завершён: {finished_at}\n'
         text = f'{text}\n{order.description}\n{formed_message}'
 
-        keyboard = [[self.get_new_order_button(), self.get_my_orders_button()], [self.get_main_menu_button()]]
+        context.user_data['order_id'] = order.pk
+        keyboard = [
+            [InlineKeyboardButton('Написать сообщение по заказу', callback_data='client_make_question_order')],
+            [self.get_new_order_button(), self.get_my_orders_button()],
+            [self.get_main_menu_button()]
+        ]
 
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -328,6 +336,32 @@ class Command(BaseCommand):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return CLIENT_BASE_MENU
+ 
+    def handle_client_make_question_order(self, update, context):
+
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='Введите сообщение'
+        )
+
+        return CLIENT_ADD_QUESTION_ORDER
+        
+    def handle_client_add_question_order(self, update, context):
+
+        keyboard = []
+        message_question = update.message.text
+        order = Order.objects.get(pk=context.user_data['order_id'])
+
+        message = 'Ваш вопрос отправлен программисту'
+
+        question = Message.objects.create(text=message_question, order=order, sender_role=1)
+
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=message,
+        )
+
+        return self.send_client_order_details(update, context)        
 
     def get_order_number_from_bot(self, update, context):
         """Извлекает номер заказа из бота."""

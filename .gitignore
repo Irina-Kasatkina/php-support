@@ -126,6 +126,7 @@ dmypy.json
 .idea/
 
 # This project
+error_processing.py
 static/
 media/
 migrations/
