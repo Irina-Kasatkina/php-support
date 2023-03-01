@@ -5,6 +5,7 @@ from datetime import date, datetime
 from functools import partial
 from textwrap import dedent
 
+import telegram
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
@@ -433,19 +434,7 @@ class Command(BaseCommand):
 
         keyboard = []
 
-        try:
-            developer = Developer.objects.get(chat__chat_id=update.effective_chat.id)
-        except ObjectDoesNotExist:
-            message = 'Вы не зарегистрированные в боте'
-            keyboard.append([InlineKeyboardButton('Назад', callback_data='developer')])
-            context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=message,
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-            return DEVELOPER_BASE_MENU
-
-        query = Q(developer=developer) & Q(finished_at__isnull=False)
+        query = Q(developer__chat__chat_id=update.effective_chat.id) & Q(finished_at__isnull=False)
         orders = Order.objects.filter(query)
 
         if not orders:
@@ -476,19 +465,7 @@ class Command(BaseCommand):
 
         keyboard = []
 
-        try:
-            developer = Developer.objects.get(chat__chat_id=update.effective_chat.id)
-        except ObjectDoesNotExist:
-            message = 'Вы не зарегистрированные в боте'
-            keyboard.append([InlineKeyboardButton('Назад', callback_data='developer')])
-            context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=message,
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-            return DEVELOPER_BASE_MENU
-
-        query = Q(developer=developer) & Q(finished_at__isnull=True)
+        query = Q(developer__chat__chat_id=update.effective_chat.id) & Q(finished_at__isnull=True)
         orders = Order.objects.filter(query)
 
         if not orders:
@@ -693,7 +670,7 @@ class Command(BaseCommand):
             )
 
         chat, created = Chat.objects.get_or_create(chat_id=update.effective_chat.id)
-        developer, created = Developer.objects.get_or_create(name='None', chat=chat, work_allowed=True)
+        developer, created = Developer.objects.get_or_create(name=update.effective_chat.id, chat=chat, work_allowed=True)
         order.developer = developer
         order.save()
 
